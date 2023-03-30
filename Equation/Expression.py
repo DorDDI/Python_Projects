@@ -116,3 +116,53 @@ class VariableExpression(Variable,Expression):
 
 
 
+class Addition(Expression):
+    def __init__(self, A: Expression, B: Expression) -> Expression:
+        self.A = A
+        self.B = B
+        self.var_name = (str(self.A)+"+"+str(self.B))
+
+
+    def evaluate(self, assgms: Assignments) -> float:
+        return self.A.evaluate(assgms) + self.B.evaluate(assgms)
+
+    def derivative(self, v: Variable):
+        return Addition(self.A.derivative(v), self.B.derivative(v))
+
+    def __repr__(self) -> str:
+        return ("("+str(self.A)+"+"+str(self.B)+")")
+
+
+class Subtraction(Expression):
+    def __init__(self, A: Expression, B: Expression) -> Expression:
+        self.A = A
+        self.B = B
+        self.var_name = (str(self.A) + "-" + str(self.B))
+
+    def evaluate(self, assgms: Assignments) -> float:
+        return self.A.evaluate(assgms) - self.B.evaluate(assgms)
+
+    def derivative(self, v: Variable):
+        return Subtraction(self.A.derivative(v), self.B.derivative(v))
+
+    def __repr__(self) -> str:
+        return ("("+str(self.A)+"-"+str(self.B)+")")
+    # TODO complete all Expression interface methods
+
+
+class Multiplication(Expression):
+    def __init__(self, A: Expression, B: Expression) -> Expression:
+        self.A = A
+        self.B = B
+        self.var_name = (str(self.A) + "*" + str(self.B))
+    def evaluate(self, assgms: Assignments) -> float:
+        return self.A.evaluate(assgms) * self.B.evaluate(assgms)
+
+    def derivative(self, v: Variable):
+        return Addition((self.A.derivative(v))*self.B, self.A*(self.B.derivative(v)))
+
+    def __repr__(self) -> str:
+        return ("("+str(self.A)+"*"+str(self.B)+")")
+    # TODO complete all Expression interface methods
+
+
