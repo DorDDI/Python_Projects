@@ -166,3 +166,19 @@ class Multiplication(Expression):
     # TODO complete all Expression interface methods
 
 
+class Power(Expression):
+    def __init__(self, exp: Expression, p: float) -> Expression:
+        self.exp = exp
+        self.power = float(p)
+        self.var_name = (str(self.exp) + "^" + str(self.power))
+
+    def evaluate(self, assgms: Assignments) -> float:
+        return self.exp.evaluate(assgms)**self.power
+
+    def derivative(self, v: Variable):
+        return Multiplication(Multiplication(Constant(self.power),Power(self.exp,self.power-1)),self.exp.derivative(v))
+
+    def __repr__(self) -> str:
+        return ("("+str(self.exp)+"^"+str(self.power)+")")
+
+
