@@ -182,3 +182,79 @@ class Power(Expression):
         return ("("+str(self.exp)+"^"+str(self.power)+")")
 
 
+class Polynomial(Expression):
+    def __init__(self, v: Variable, coefs: list) -> Expression:
+        self.var_name = v
+        self.lenc = len(coefs)
+        self.polly = {0:coefs[0]}
+        if self.lenc !=1:
+            self.polly[1] = coefs[1]
+            for i in range (2,self.lenc):
+                self.polly[i] = coefs[i]
+        pass
+
+
+    def evaluate(self, assgms: Assignments) -> float:
+        var_value = assgms[self.var_name.get_name()]
+        if var_value == None:
+            return 0
+        sum = self.polly[0]
+        for i in range (1,len(self.polly)):
+            sum += self.polly[i]*(var_value**i)
+        return float(sum)
+
+    def derivative(self, v: Variable):
+        if v == self.var_name:
+            new_polly = {}
+            for i in range (1,self.lenc):
+                new_polly[i-1] = self.polly[i]*i
+            new_list = []
+            for i in range (len(new_polly)):
+                new_list.append(new_polly[i])
+            return Polynomial(self.var_name,new_list)
+        else:
+            return Constant(0.0)
+    def __repr__(self) -> str:
+        rep = "("
+        for i in range(self.lenc-1,-1,-1):
+            if self.polly[i]!=0:
+                if i ==1:
+                     if self.polly[i]>0:
+                          rep += "+"
+                     rep += str(self.polly[i]) + "x"
+                elif i == 0:
+                     if self.polly[i] > 0:
+                          rep += "+"
+                     rep +=  str(self.polly[i])
+                elif i == self.lenc-1:
+                        rep += str(self.polly[i]) + "x^" + str(i)
+                else:
+                    if self.polly[i] > 0:
+                        rep += "+"
+                    rep += str(self.polly[i]) + "x^" + str(i)
+        rep+=")"
+        if rep[1]=="+":
+            rep = "(" + rep[2:]
+        return rep
+
+
+    def NR_evaluate(self, assgms:Assignments, epsilon: int = 0.0001, times: int = 100):
+        NR_sda = SimpleDictionaryAssignments()
+        NR_sda += assgms
+        x_n = NR_sda[self.var_name.get_name()]
+        if abs(self.evaluate(NR_sda)) <= epsilon:
+            return x_n
+        for i in range (times):
+            new_x_n = self.x_n_1(x_n,NR_sda)
+            asa = (ValueAssignment(self.var_name, new_x_n))
+            NR_sda += asa
+            if abs(self.evaluate(NR_sda)) <= epsilon:
+                return new_x_n
+            x_n = new_x_n
+        raise ValueError
+
+    def x_n_1(self,x_n, NR_sda:Assignments):
+        fx = self.evaluate(NR_sda)
+        ftagx = self.derivative(self.var_name)
+        ff = ftagx.evaluate(NR_sda)
+        return x_n-(fx/ff)
