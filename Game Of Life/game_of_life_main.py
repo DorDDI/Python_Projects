@@ -250,7 +250,14 @@ def __init__(self, size_of_board, board_start_mode, rules, rle="", pattern_posit
         return row,column
 
 
-
+    def rle_to_board (self, rle_matrix,rle_row,rle_col):
+        rle_board = np.zeros((self.size_of_board, self.size_of_board))
+        row = int(self.pattern_position[0])   # index of the rows, start with the the position
+        column = int(self.pattern_position[1])  # index of the column, start with the the position
+        for i in range(rle_row+1):
+            for j in range(rle_col):
+                rle_board[row+i][column+j]=rle_matrix[i][j]
+        return rle_board
 
 
 if __name__ == '__main__': 
