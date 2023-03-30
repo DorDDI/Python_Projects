@@ -261,3 +261,11 @@ def __init__(self, size_of_board, board_start_mode, rules, rle="", pattern_posit
 
 
 if __name__ == '__main__': 
+    zmani = GameOfLife(100,1,'B3/S23',"",(0,0))
+    zmani.display_board()
+    # add 2 second delay so we can see first plot
+
+    for i in range(100):
+        zmani.update()
+        zmani.display_board()
+    zmani.save_board_to_file('last_tmuna.png')
