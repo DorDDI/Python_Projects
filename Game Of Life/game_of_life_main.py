@@ -26,6 +26,45 @@ def __init__(self, size_of_board, board_start_mode, rules, rle="", pattern_posit
         self.board = self.start()  # start new matrix to board
 
 
+    def start(self):
+        if self.rle == "":
+            if self.board_start_mode == 2:
+                return np.random.choice([self.dead, self.alive], self.size_of_board*self.size_of_board, p=[0.2, 0.8]).reshape(self.size_of_board,self.size_of_board)
+            elif self.board_start_mode == 3:
+                return np.random.choice([self.dead, self.alive], self.size_of_board*self.size_of_board, p=[0.8, 0.2]).reshape(self.size_of_board,self.size_of_board)
+            elif self.board_start_mode == 4:
+                self.pattern_position = (10,10)
+                x, y = self.row_col("24bo11b$22bobo11b$12b2o6b2o12b2o$11bo3bo4b2o12b2o$2o8bo5bo3b2o14b$2o8bo3bob2o4bobo11b$10bo5bo7bo11b$11bo3bo20b$12b2o!")
+                arr = self.transform_rle_to_matrix("24bo11b$22bobo11b$12b2o6b2o12b2o$11bo3bo4b2o12b2o$2o8bo5bo3b2o14b$2o8bo3bob2o4bobo11b$10bo5bo7bo11b$11bo3bo20b$12b2o!")
+                return self.rle_to_board(arr,x,y)
+            else:
+                return np.random.choice([self.dead, self.alive], self.size_of_board*self.size_of_board, p=[0.5, 0.5]).reshape(self.size_of_board,self.size_of_board)
+        else:
+            x,y = self.row_col(self.rle)
+            arr = self.transform_rle_to_matrix(self.rle)
+            return self.rle_to_board(arr,x,y)
+
+    def update(self):
+        """ This method updates the board game by the rules of the game. Do a single iteration.
+        Input None.
+        Output None.
+        """
+        new_board = self.board.copy()
+        born, survive = self.rule_read()
+        for i in range(self.size_of_board):
+            for j in range(self.size_of_board):
+                if self.board[i][j] == 0:  # check if the cell is dead
+                    sum = self.sum_num_8(i, j)
+                    if str(int(sum/255)) in born:  # check if the cell can be born
+                        new_board[i][j] = 255
+                else:    # check if the cell is alive
+                    sum = self.sum_num_8(i, j)
+                    if str(int(sum / 255)) in survive:  # check if the cell can survive
+                        pass
+                    else:
+                        new_board[i][j] = 0
+        self.board = new_board.copy()
+
 
 
 
