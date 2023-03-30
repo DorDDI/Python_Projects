@@ -120,6 +120,136 @@ def __init__(self, size_of_board, board_start_mode, rules, rle="", pattern_posit
         """
         return self.board.tolist()
 
+    def rule_read(self):  # example rule = B36/S23
+        index = 1
+        num = ""
+        id = self.rules[index]
+        while id != "/":
+            num += id
+            index += 1
+            id = self.rules[index]
+        born = (num)
+        num = ""
+        index += 2
+        for i in range(index,len(self.rules)):
+            id = self.rules[i]
+            num += id
+        survive = (num)
+        return (born,survive)
+
+    def transform_rle_to_matrix(self, rle):
+        """ This method transforms an rle coded pattern to a two dimensional list that holds the pattern,
+         Dead will be donated with 0 while alive will be donated with 255.
+        Input an rle coded string.
+        Output a two dimensional list that holds a pattern with a size of the bounding box of the pattern.
+        """
+        row = 0
+        flag = False  # see when we go to the second row
+        column = 0
+        i=0
+        pos = rle[i]
+        while i < len(rle)-1:
+            if pos == "$":
+                if (rle[i-1] >= "0") and (rle[i-1] <= "9"):  #check if there is number before $
+                    if(rle[i-2] >= "1") and (rle[i-2] <= "9"):  #check if there is 2 numbers before $
+                        row += int(rle[i-2]+rle[i-1])
+                        i+=2
+                    else:
+                        row += int(rle[i - 1])
+                        i+=1
+                else:
+                    row += 1
+                flag = True
+            else:
+                if flag == False:
+                    if (rle[i] == "b") or (rle[i] == "o"):
+                        column += 1
+                    elif (rle[i] >= "1") and (rle[i] <= "9"):  # if the id is between 2-99
+                        if (rle[i+1] >= "0") and (rle[i+1] <= "9"):  # if id between 10-99
+                            column += int(rle[i]+rle[i+1])
+                            i += 2
+                        else:
+                            column += int(rle[i])
+                            i += 1
+            i +=1
+            pos = rle[i]
+        rle_board = np.zeros((row+1, column+1))
+        index = 0  # index of the rle
+        id = rle[index]
+        row = 0
+        column = 0
+        while id != "!":
+            if id == "!":
+                break
+            elif id == "b":
+                column += 1
+            elif id == "o":
+                rle_board[row][column] = self.alive
+                column +=1
+            elif id == "$":
+                row += 1
+                column = 0
+            elif (id >= "1") and (id <= "9"):  # if the id is between 2-99
+                if (rle[index+1] >= "0") and (rle[index+1] <= "9"):  # if id between 10-99
+                    if rle[index+2] == "$": # we need to go down lines
+                        row+=int(id + rle[index+1])
+                        column = 0
+                    elif rle[index+2] == "b":  # there is "b" cells
+                        column +=int(id + rle[index+1])
+                    else:  # there is "o" cells
+                        for i in range(int(id + rle[index+1])):
+                            rle_board[row][column] = self.alive
+                            column +=1
+                    index +=2
+                else:  # if id between 2-9
+                    if rle[index+1] == "$":
+                        row += int(id)
+                        column = 0
+                    elif rle[index+1] == "b":   # there is "b" cells
+                        column +=int(id)
+                    else:  # there is "o" cells
+                        for i in range(int(id)):
+                            rle_board[row][column] = self.alive
+                            column +=1
+                    index +=1
+            index += 1
+            id = rle[index]
+        return rle_board
+
+    def row_col(self, rle):
+        row = 0
+        flag = False  # see when we go to the second row
+        column = 0
+        i = 0
+        pos = rle[i]
+        while i < len(rle) - 1:
+            if pos == "$":
+                if (rle[i - 1] >= "0") and (rle[i - 1] <= "9"):  # check if there is number before $
+                    if (rle[i - 2] >= "1") and (rle[i - 2] <= "9"):  # check if there is 2 numbers before $
+                        row += int(rle[i - 2] + rle[i - 1])
+                        i += 2
+                    else:
+                        row += int(rle[i - 1])
+                        i += 1
+                else:
+                    row += 1
+                flag = True
+            else:
+                if flag == False:
+                    if (rle[i] == "b") or (rle[i] == "o"):
+                        column += 1
+                    elif (rle[i] >= "1") and (rle[i] <= "9"):  # if the id is between 2-99
+                        if (rle[i + 1] >= "0") and (rle[i + 1] <= "9"):  # if id between 10-99
+                            column += int(rle[i] + rle[i + 1])
+                            i += 2
+                        else:
+                            column += int(rle[i])
+                            i += 1
+            i += 1
+            pos = rle[i]
+        return row,column
+
+
 
 
 
