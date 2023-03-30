@@ -65,6 +65,61 @@ def __init__(self, size_of_board, board_start_mode, rules, rle="", pattern_posit
                         new_board[i][j] = 0
         self.board = new_board.copy()
 
+    def sum_num_8(self,i,j):  # return the sum of the 8 cell around
+        big = self.size_of_board - 1  # the end of the rows or columns
+        if (i == 0) and (j == 0):  # if is in the left up corner
+            return (self.board[i][j + 1] + self.board[i + 1][j + 1] + self.board[i + 1][j] + self.board[i + 1][big] + \
+                    self.board[i][big] + self.board[big][big] + self.board[big][j] + self.board[big][j + 1])
+        elif (i == 0) and (j == big):  # if is in the right up corner
+            return (self.board[1][big] + self.board[1][big - 1] + self.board[i][big - 1] + self.board[big][big - 1] + \
+                    self.board[big][big] + self.board[big][0] + self.board[1][0] + self.board[0][0])
+        elif (i == big) and (j == 0):  # if is in the left down corner
+            return (self.board[big - 1][0] + self.board[big - 1][1] + self.board[big][1] + self.board[0][1] + \
+                    self.board[0][0] + self.board[0][big] + self.board[big][big] + self.board[big - 1][big])
+        elif (i == big) and (j == big):  # if is in the right down corner
+            return (self.board[big][big - 1] + self.board[big - 1][big - 1] + self.board[big - 1][big] + self.board[big - 1][0] + \
+                    self.board[big][0] + self.board[0][0] + self.board[0][big] + self.board[0][big-1])
+        elif i == 0:  # in the first row
+            return (self.board[i][j - 1] + self.board[big][j - 1] + self.board[big][j] + self.board[big][j + 1] + \
+                    self.board[i][j + 1] + self.board[i + 1][j + 1] + self.board[i + 1][j] + self.board[i + 1][j - 1])
+        elif i == big:  # in the last row
+            return (self.board[i][j - 1] + self.board[i - 1][j - 1] + self.board[i - 1][j] + self.board[i-1][j+1] + \
+                    self.board[i][j + 1] + self.board[0][j + 1] + self.board[0][j] + self.board[0][j - 1])
+        elif j == 0:  # in the first column
+            return (self.board[i - 1][j] + self.board[i - 1][j + 1] + self.board[i][j + 1] + self.board[i + 1][j + 1] + \
+                    self.board[i + 1][j] + self.board[i + 1][big] + self.board[i][big] + self.board[i - 1][big])
+        elif j == big:  # in the last column
+            return (self.board[i + 1][j] + self.board[i + 1][j - 1] + self.board[i][j - 1] + self.board[i - 1][j - 1] + \
+                    self.board[i - 1][j] + self.board[i + 1][0] + self.board[i][0] + self.board[i - 1][0])
+        else:  # in the middle
+            return (self.board[i - 1][j - 1] + self.board[i - 1][j] + self.board[i - 1][j + 1] + self.board[i][j - 1] + \
+                    self.board[i][j + 1] + self.board[i + 1][j - 1] + self.board[i + 1][j] + self.board[i + 1][j + 1])
+
+    def save_board_to_file(self,file_name):
+        """ This method saves the current state of the game to a file. You should use Matplotlib for this.
+        Input img_name donates the file name. Is a string, for example file_name = '1000.png'
+        Output a file with the name that donates filename.
+        """
+        plt.imshow(self.board)
+        plt.imsave(file_name,self.board)
+
+    def display_board(self):
+        """ This method displays the current state of the game to the screen. You can use Matplotlib for this.
+        Input None.
+        Output a figure should be opened and display the board.
+        """
+        plt.imshow(self.board)
+        plt.pause(0.01)
+        plt.show()
+
+    def return_board(self):
+        """ This method returns a list of the board position. The board is a two-dimensional list that every
+        cell donates if the cell is dead or alive. Dead will be donated with 0 while alive will be donated with 255.
+        Input None.
+        Output a list that holds the board with a size of size_of_board*size_of_board.
+        """
+        return self.board.tolist()
+
 
 
 
